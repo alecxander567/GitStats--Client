@@ -9,7 +9,6 @@ import { AlertProvider } from "./contexts/AlertContext";
 import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
-import { HomePage } from "./pages/HomePage";
 import { GitHubCallback } from "./pages/GitHubCallback";
 import { RepositoriesPage } from "./pages/RepositoriesPage";
 import { LanguageSummaryPage } from "./pages/LanguageSummaryPage";
@@ -20,7 +19,6 @@ import { RepositoryCategoriesPage } from "./pages/RepositoryCategoriesPage";
 import { CommunitiesPage } from "./pages/CommunitiesPage";
 import { CommunityDetailPage } from "./pages/CommunityDetailPage";
 import { CommunityPostsPage } from "./pages/CommunityPostsPage";
-// Import README Profile page
 import { ReadmeProfilePage } from "./pages/ReadmeProfilePage";
 
 function App() {
@@ -29,7 +27,8 @@ function App() {
       <AuthProvider>
         <AlertProvider>
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            {/* Redirect root to dashboard */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/auth/github/callback" element={<GitHubCallback />} />
             <Route
@@ -112,7 +111,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            {/* README Profile Route */}
             <Route
               path="/readme-profile"
               element={
