@@ -8,6 +8,8 @@ import {
   FaSync,
   FaDownload,
   FaClock,
+  FaCopy,
+  FaCheck,
 } from "react-icons/fa";
 import { Button } from "../common/Button";
 import { LoadingSpinner } from "../common/LoadingSpinner";
@@ -24,7 +26,19 @@ export const ReadmeEditor = ({
   onToggleAutoUpdate,
   nextUpdate,
 }) => {
-  const [activeTab, setActiveTab] = useState("edit"); // 'edit' or 'preview'
+  const [activeTab, setActiveTab] = useState("preview"); // default to the finished, ready-to-copy view
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    if (!generatedContent) return;
+    try {
+      await navigator.clipboard.writeText(generatedContent);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Copy failed:", err);
+    }
+  };
 
   return (
     <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
@@ -70,6 +84,17 @@ export const ReadmeEditor = ({
             className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary">
             <FaSync className={loading ? "animate-spin w-3 h-3" : "w-3 h-3"} />
             Regenerate
+          </Button>
+          <Button
+            onClick={handleCopy}
+            disabled={loading || !generatedContent}
+            size="sm"
+            variant="outline"
+            className="flex items-center gap-2">
+            {copied ?
+              <FaCheck className="w-3 h-3 text-green-400" />
+            : <FaCopy className="w-3 h-3" />}
+            {copied ? "Copied!" : "Copy README"}
           </Button>
           <Button
             onClick={onExport}
