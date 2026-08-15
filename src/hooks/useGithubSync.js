@@ -4,13 +4,13 @@ import { languageService } from "../services/languageService";
 import { repositoryService } from "../services/repositoryService";
 import { analyticsService } from "../services/analyticsService";
 import { contributorService } from "../services/contributorService";
-import { api } from "../services/api"; // Add this import
+import { api } from "../services/api";
 
 export const LANGUAGES_SYNCED_EVENT = "languages-synced";
 export const ANALYTICS_SYNCED_EVENT = "analytics-synced";
 export const CONTRIBUTORS_SYNCED_EVENT = "contributors-synced";
 export const CONTRIBUTOR_ACTIVITY_SYNCED_EVENT = "contributor-activity-synced";
-export const CATEGORIES_SYNCED_EVENT = "categories-synced"; // Add this
+export const CATEGORIES_SYNCED_EVENT = "categories-synced";
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -123,7 +123,6 @@ export const useGithubSync = (syncRepositories) => {
       return response.data;
     } catch (error) {
       console.warn("Failed to sync categories:", error);
-      // Don't throw - categories sync is optional
       return null;
     } finally {
       setSyncingCategories(false);
@@ -376,14 +375,6 @@ export const useGithubSync = (syncRepositories) => {
                 if (failed) failedActivityCount += 1;
               }
 
-              // FIX: only include `recent_commits` when we actually have
-              // fresh data. Previously this always sent `recent_commits:
-              // activityData?.recentCommits || []` — so a failed/rate
-              // limited fetch sent an explicit empty array, which the
-              // backend used to OVERWRITE the contributor's existing
-              // (good) commit history. Omitting the key when we don't
-              // have fresh data lets the backend keep whatever it already
-              // has instead of wiping it.
               const contributorPayload = {
                 id: contributor.id,
                 login: contributor.login,
@@ -461,7 +452,7 @@ export const useGithubSync = (syncRepositories) => {
                     ` (${failedActivityCount} contributor${failedActivityCount > 1 ? "s" : ""} hit rate limits — retry sync to fill in the rest)`
                   : "";
                 onProgress(
-                  `✅ Synced ${processedContributors.length} contributors and ${activities.length} activity records${failureNote}`,
+                  `Synced ${processedContributors.length} contributors and ${activities.length} activity records${failureNote}`,
                 );
               }
             }
@@ -498,7 +489,7 @@ export const useGithubSync = (syncRepositories) => {
         syncContributors = true,
         forceFull = false,
         currentUsername = null,
-        syncCategories: shouldSyncCategories = true, // Add this option
+        syncCategories: shouldSyncCategories = true,
       } = options;
       setSyncError(null);
       setSyncing(true);
@@ -590,9 +581,7 @@ export const useGithubSync = (syncRepositories) => {
             setCompletedRepos(i + 1);
           } catch (err) {
             console.error(`Failed to sync ${repo.full_name}:`, err);
-            setSyncMessage(
-              `⚠️ Failed to sync ${repo.full_name}: ${err.message}`,
-            );
+            setSyncMessage(`Failed to sync ${repo.full_name}: ${err.message}`);
             delete syncMeta[repo.full_name];
             saveSyncMeta(syncMeta);
           }
@@ -622,7 +611,7 @@ export const useGithubSync = (syncRepositories) => {
             ` (${totalFailedActivity} contributor activity fetches hit rate limits — ${incompleteCount} repo${incompleteCount > 1 ? "s" : ""} will retry automatically on next sync)`
           : "";
         setSyncMessage(
-          `✅ Successfully synced ${githubRepos.length} repositories${skipNote}${failureNote}`,
+          `Successfully synced ${githubRepos.length} repositories${skipNote}${failureNote}`,
         );
 
         // Auto-sync categories after repositories are synced
@@ -632,7 +621,7 @@ export const useGithubSync = (syncRepositories) => {
           categoriesResult = await syncCategories();
           if (categoriesResult) {
             setSyncMessage(
-              `✅ Successfully synced ${githubRepos.length} repositories and ${categoriesResult.count} categories`,
+              `Successfully synced ${githubRepos.length} repositories and ${categoriesResult.count} categories`,
             );
           }
         }
@@ -682,6 +671,6 @@ export const useGithubSync = (syncRepositories) => {
     totalRepos,
     completedRepos,
     syncingCategories,
-    syncCategories, // Export this for manual category sync
+    syncCategories,
   };
 };
