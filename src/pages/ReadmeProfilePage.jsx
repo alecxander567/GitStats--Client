@@ -5,6 +5,59 @@ import { LoadingSpinner } from "../components/common/LoadingSpinner";
 import { useReadmeProfile } from "../hooks/useReadmeProfile";
 import { FaFileAlt, FaInfoCircle } from "react-icons/fa";
 
+// Mirrors ReadmeGenerator.get_default_template() on the backend. Shown in
+// the Edit tab whenever profile.content is empty, so the textarea never
+// just sits blank with nothing to work from - matches what actually gets
+// used for generation when content is empty anyway.
+const DEFAULT_TEMPLATE = `<div align="center">
+
+# {{user.name}}
+
+{{user.bio}}
+
+**Location:** {{user.location}} &nbsp;|&nbsp; **Company:** {{user.company}} &nbsp;|&nbsp; **Blog:** {{user.blog}}
+
+</div>
+
+---
+
+## GitHub Stats
+
+![GitHub Stats]({{stats_card_url}})
+
+### Activity Summary
+
+| Metric | Count |
+|---|---|
+| Total Repositories | {{stats.total_repos}} |
+| Total Stars Received | {{stats.total_stars}} |
+| Total Forks | {{stats.total_forks}} |
+| Public Repos | {{stats.public_repos}} |
+| Private Repos | {{stats.private_repos}} |
+
+### Top Languages
+
+{{languages.top_5}}
+
+### Recent Activity (Last 30 Days)
+
+| Type | Count |
+|---|---|
+| Commits | {{contributions.last_30_days.commits}} |
+| Pull Requests | {{contributions.last_30_days.prs}} |
+| Issues | {{contributions.last_30_days.issues}} |
+
+---
+
+<div align="center">
+
+From [{{user.username}}](https://github.com/{{user.username}})
+
+_Last updated: {{current_date}}_
+
+</div>
+`;
+
 export const ReadmeProfilePage = () => {
   const {
     profile,
@@ -26,8 +79,13 @@ export const ReadmeProfilePage = () => {
   const [generatedContent, setGeneratedContent] = useState("");
 
   useEffect(() => {
-    if (profile?.content !== undefined) {
+    if (profile?.content) {
       setLocalContent(profile.content);
+    } else if (profile !== undefined && profile !== null) {
+      // content is empty - show the default template instead of a blank
+      // box, and save it back so future loads have something real stored.
+      setLocalContent(DEFAULT_TEMPLATE);
+      updateProfile({ content: DEFAULT_TEMPLATE });
     }
     if (profile?.generated_content !== undefined) {
       setGeneratedContent(profile.generated_content);
