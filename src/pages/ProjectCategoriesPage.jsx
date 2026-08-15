@@ -301,17 +301,6 @@ export const ProjectCategoriesPage = () => {
                 Clear Filters
               </Button>
             )}
-            {!hasActiveFilters && !searchTerm && (
-              <Button
-                onClick={handleSync}
-                className="mt-4 flex items-center gap-2 bg-gradient-to-r from-primary to-secondary"
-                disabled={syncing}>
-                <FaSync
-                  className={syncing ? "animate-spin w-4 h-4" : "w-4 h-4"}
-                />
-                Sync Now
-              </Button>
-            )}
           </div>
         : viewMode === "grid" ?
           // Grid View
