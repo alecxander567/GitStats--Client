@@ -36,6 +36,9 @@ import {
   FaTerminal,
   FaCode,
   FaArrowRight,
+  FaSpinner,
+  FaCheckCircle,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import {
   SiTypescript,
@@ -90,6 +93,8 @@ export const DashboardPage = () => {
   const { user } = useAuth();
   const { showAlert } = useAlert();
   const [userCommunities, setUserCommunities] = useState([]);
+  const [syncProgress, setSyncProgress] = useState(null);
+  const [showProgress, setShowProgress] = useState(false);
 
   const {
     repositories,
@@ -99,7 +104,15 @@ export const DashboardPage = () => {
 
   const { stats, loading: statsLoading, fetchStats } = useRepositoryStats();
 
-  const { runSync, syncing } = useGithubSync(syncRepositories);
+  const {
+    runSync,
+    syncing,
+    syncMessage,
+    syncError,
+    currentRepo,
+    totalRepos,
+    completedRepos,
+  } = useGithubSync(syncRepositories);
 
   const {
     communities,
@@ -122,9 +135,42 @@ export const DashboardPage = () => {
     }
   }, [communities, user]);
 
+  // Update progress when sync state changes
+  useEffect(() => {
+    if (syncing) {
+      setShowProgress(true);
+      setSyncProgress({
+        message: syncMessage,
+        current: completedRepos,
+        total: totalRepos,
+        currentRepo: currentRepo,
+      });
+    } else if (syncError) {
+      setShowProgress(false);
+      showAlert(syncError);
+    } else if (syncMessage && !syncing) {
+      setShowProgress(false);
+      // Show success message if sync completed
+      if (syncMessage.includes("Successfully synced")) {
+        showAlert(syncMessage);
+      }
+    }
+  }, [
+    syncing,
+    syncMessage,
+    syncError,
+    completedRepos,
+    totalRepos,
+    currentRepo,
+    showAlert,
+  ]);
+
   const handleConnectGitHub = () => {
     const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID;
-    const redirectUri = "http://localhost:5173/auth/github/callback";
+    const redirectUri =
+      import.meta.env.VITE_API_URL ?
+        `${import.meta.env.VITE_API_URL.replace("/api", "")}/auth/github/callback`
+      : "http://localhost:5173/auth/github/callback";
     const scope = "user repo read:org";
     const githubAuthUrl = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}`;
     window.location.href = githubAuthUrl;
@@ -189,7 +235,6 @@ export const DashboardPage = () => {
       });
       if (success) {
         await fetchStats();
-        showAlert("Repositories synced successfully!");
       }
     } catch (error) {
       showAlert(error.message || "Failed to sync repositories");
@@ -206,7 +251,6 @@ export const DashboardPage = () => {
       });
       if (success) {
         await fetchStats();
-        showAlert("Full resync completed successfully!");
       }
     } catch (error) {
       showAlert(error.message || "Failed to perform full resync");
@@ -259,6 +303,44 @@ export const DashboardPage = () => {
             </Button>
           </div>
         </div>
+
+        {/* Sync Progress Bar */}
+        {showProgress && syncProgress && (
+          <div className="mb-6 bg-white/10 backdrop-blur-xl rounded-xl p-4 border border-white/20">
+            <div className="flex items-center gap-3 mb-2">
+              <FaSpinner className="animate-spin text-primary w-5 h-5" />
+              <span className="text-white font-medium">
+                {syncProgress.message || "Syncing repositories..."}
+              </span>
+            </div>
+            {syncProgress.currentRepo && (
+              <p className="text-white/60 text-sm mb-2">
+                Currently processing:{" "}
+                <span className="text-white font-mono">
+                  {syncProgress.currentRepo}
+                </span>
+              </p>
+            )}
+            {syncProgress.total > 0 && (
+              <div className="space-y-1">
+                <div className="flex justify-between text-sm text-white/60">
+                  <span>Progress</span>
+                  <span>
+                    {syncProgress.current} / {syncProgress.total}
+                  </span>
+                </div>
+                <div className="w-full bg-white/10 rounded-full h-2.5 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-primary to-secondary h-2.5 rounded-full transition-all duration-500"
+                    style={{
+                      width: `${syncProgress.total > 0 ? (syncProgress.current / syncProgress.total) * 100 : 0}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
           <div className="bg-white/10 backdrop-blur-xl rounded-xl p-4 md:p-6 border border-white/20 hover:border-primary/50 transition-all">
