@@ -102,6 +102,13 @@ export const ReadmeProfilePage = () => {
   };
 
   const handleRegenerate = async () => {
+    // Flush any pending auto-save immediately instead of waiting for the
+    // 2s debounce - without this, clicking Regenerate right after typing
+    // (before the debounce fires) generates from the OLD saved content,
+    // not what's actually in the textarea. That's why edits sometimes
+    // "don't show up" after Regenerate.
+    clearTimeout(window._saveTimeout);
+    await updateProfile({ content: localContent });
     await regenerate();
     await fetchProfile();
   };
