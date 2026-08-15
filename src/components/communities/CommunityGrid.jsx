@@ -1,5 +1,6 @@
 import React from "react";
 import { CommunityCard } from "./CommunityCard";
+import { FaInbox } from "react-icons/fa";
 
 export const CommunityGrid = ({
   communities,
@@ -32,7 +33,9 @@ export const CommunityGrid = ({
   if (communities.length === 0) {
     return (
       <div className="text-center py-12">
-        <div className="text-6xl mb-4">🏗️</div>
+        <div className="flex justify-center mb-4">
+          <FaInbox className="text-6xl text-white/20" />
+        </div>
         <h3 className="text-xl font-medium text-white mb-2">
           No Communities Yet
         </h3>
