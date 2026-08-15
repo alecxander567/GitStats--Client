@@ -524,12 +524,14 @@ export const DashboardPage = () => {
                 <p className="text-white/60 text-sm md:text-base">
                   You haven't created any communities yet
                 </p>
-                <Link to="/communities">
-                  <Button className="mt-3 text-sm flex items-center gap-2">
-                    <FaUserPlus className="w-4 h-4" />
-                    Create Your First Community
-                  </Button>
-                </Link>
+                <div className="flex justify-center">
+                  <Link to="/communities">
+                    <Button className="mt-3 text-sm flex items-center gap-2">
+                      <FaUserPlus className="w-4 h-4" />
+                      Create Your First Community
+                    </Button>
+                  </Link>
+                </div>
               </div>
             }
           </div>

@@ -15,7 +15,6 @@ import {
   FaComments,
   FaArrowRight,
   FaInbox,
-  FaHashtag,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
@@ -121,10 +120,10 @@ export const CommunitiesPage = () => {
               Discover and join developer communities
             </p>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
+          <div className="flex gap-2 w-full sm:w-auto justify-center sm:justify-end">
             <Button
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 flex-1 sm:flex-none">
+              className="flex items-center gap-2 flex-1 sm:flex-none justify-center">
               <FaPlus className="w-4 h-4" />
               New Community
             </Button>
