@@ -5,6 +5,8 @@ import { CategoryBadge } from "../components/project-categories/CategoryBadge";
 import { CategorySummary } from "../components/project-categories/CategorySummary";
 import { Button } from "../components/common/Button";
 import { LoadingSpinner } from "../components/common/LoadingSpinner";
+import { useAlert } from "../contexts/AlertContext";
+import { api } from "../services/api";
 import {
   FaSync,
   FaTimes,
@@ -13,9 +15,13 @@ import {
   FaList,
   FaThLarge,
   FaFilter,
+  FaInbox,
+  FaHashtag,
+  FaInfoCircle,
 } from "react-icons/fa";
 
 export const ProjectCategoriesPage = () => {
+  const { showAlert } = useAlert();
   const {
     categories,
     loading,
@@ -28,6 +34,7 @@ export const ProjectCategoriesPage = () => {
 
   const [stats, setStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [viewMode, setViewMode] = useState("list");
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -61,6 +68,24 @@ export const ProjectCategoriesPage = () => {
       setStatsLoading(false);
     }
   }, [fetchCategories, getStats]);
+
+  const handleSync = useCallback(async () => {
+    setSyncing(true);
+    setLocalError(null);
+    try {
+      const response = await api.post("/project-categories/sync/");
+      showAlert(response.data.message || "Categories synced successfully!");
+      // Refresh data after sync
+      await handleRefresh();
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to sync categories";
+      showAlert(errorMessage);
+      setLocalError(errorMessage);
+    } finally {
+      setSyncing(false);
+    }
+  }, [handleRefresh, showAlert]);
 
   const clearFilters = useCallback(() => {
     setFilters({});
@@ -139,6 +164,14 @@ export const ProjectCategoriesPage = () => {
           </div>
           <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <Button
+              onClick={handleSync}
+              disabled={loading || statsLoading || syncing}
+              className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary hover:from-primary-light hover:to-primary"
+              title="Auto-categorize all repositories">
+              <FaSync className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} />
+              {syncing ? "Syncing..." : "Sync Categories"}
+            </Button>
+            <Button
               onClick={handleRefresh}
               disabled={loading || statsLoading}
               variant="outline"
@@ -158,7 +191,6 @@ export const ProjectCategoriesPage = () => {
             <button
               onClick={() => {
                 setLocalError(null);
-                // Note: We can't clear the hook error directly
               }}
               className="text-red-400 hover:text-red-300">
               <FaTimes />
@@ -253,7 +285,9 @@ export const ProjectCategoriesPage = () => {
           </div>
         : filteredCategories.length === 0 ?
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-12 border border-white/20 text-center">
-            <div className="text-6xl mb-4">🔍</div>
+            <div className="flex justify-center mb-4">
+              <FaInbox className="text-6xl text-white/20" />
+            </div>
             <h3 className="text-xl font-medium text-white mb-2">
               No categories found
             </h3>
@@ -265,6 +299,17 @@ export const ProjectCategoriesPage = () => {
             {(hasActiveFilters || searchTerm) && (
               <Button onClick={clearFilters} variant="outline" className="mt-4">
                 Clear Filters
+              </Button>
+            )}
+            {!hasActiveFilters && !searchTerm && (
+              <Button
+                onClick={handleSync}
+                className="mt-4 flex items-center gap-2 bg-gradient-to-r from-primary to-secondary"
+                disabled={syncing}>
+                <FaSync
+                  className={syncing ? "animate-spin w-4 h-4" : "w-4 h-4"}
+                />
+                Sync Now
               </Button>
             )}
           </div>
@@ -282,7 +327,10 @@ export const ProjectCategoriesPage = () => {
                     size="lg"
                     showConfidence={true}
                   />
-                  <span className="text-white/20 text-xs">#{category.id}</span>
+                  <span className="text-white/20 text-xs flex items-center gap-1">
+                    <FaHashtag className="w-3 h-3" />
+                    {category.id}
+                  </span>
                 </div>
                 <div className="mt-3">
                   <h4 className="text-white font-medium truncate">
@@ -295,11 +343,13 @@ export const ProjectCategoriesPage = () => {
                   )}
                 </div>
                 <div className="mt-3 pt-3 border-t border-white/10 flex justify-between text-xs">
-                  <span className="text-white/40">
+                  <span className="text-white/40 flex items-center gap-1">
+                    <FaInfoCircle className="w-3 h-3" />
                     Confidence: {category.confidence}%
                   </span>
-                  <span className="text-white/40">
-                    Repo ID: {category.repository}
+                  <span className="text-white/40 flex items-center gap-1">
+                    <FaHashtag className="w-3 h-3" />
+                    Repo: {category.repository}
                   </span>
                 </div>
               </div>
@@ -369,8 +419,9 @@ export const ProjectCategoriesPage = () => {
                         </span>
                       </td>
                       <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className="text-white/40 text-xs">
-                          #{category.id}
+                        <span className="text-white/40 text-xs flex items-center gap-1">
+                          <FaHashtag className="w-3 h-3" />
+                          {category.id}
                         </span>
                       </td>
                     </tr>

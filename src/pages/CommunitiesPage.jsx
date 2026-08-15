@@ -14,6 +14,8 @@ import {
   FaSearch,
   FaComments,
   FaArrowRight,
+  FaInbox,
+  FaHashtag,
 } from "react-icons/fa";
 import { Link } from "react-router-dom";
 

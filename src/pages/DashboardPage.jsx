@@ -37,8 +37,7 @@ import {
   FaCode,
   FaArrowRight,
   FaSpinner,
-  FaCheckCircle,
-  FaExclamationTriangle,
+  FaFolderOpen,
 } from "react-icons/fa";
 import {
   SiTypescript,
@@ -402,6 +401,7 @@ export const DashboardPage = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          {/* Recent Activity Section */}
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/20">
             <h3 className="text-lg font-bold text-white mb-3 md:mb-4">
               Recent Activity
@@ -446,7 +446,9 @@ export const DashboardPage = () => {
                 )}
               </div>
             : <div className="text-white/40 text-center py-8 md:py-12">
-                <div className="text-4xl md:text-6xl mb-4">📦</div>
+                <div className="flex justify-center mb-4">
+                  <FaFolderOpen className="text-5xl text-white/20" />
+                </div>
                 <p className="text-base md:text-lg font-medium text-white/60">
                   No repositories synced yet
                 </p>
@@ -457,7 +459,7 @@ export const DashboardPage = () => {
             }
           </div>
 
-          {/* Updated Community Section */}
+          {/* Communities Section */}
           <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 md:p-6 border border-white/20">
             <div className="flex items-center justify-between mb-3 md:mb-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -465,9 +467,12 @@ export const DashboardPage = () => {
                 Your Communities
               </h3>
               <Link to="/communities">
-                <Button variant="outline" size="sm" className="text-xs">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs flex items-center gap-1">
                   View All
-                  <FaArrowRight className="w-3 h-3 ml-1" />
+                  <FaArrowRight className="w-3 h-3" />
                 </Button>
               </Link>
             </div>
@@ -491,10 +496,14 @@ export const DashboardPage = () => {
                         <p className="text-white font-medium text-sm md:text-base truncate group-hover:text-primary transition-colors">
                           {community.name}
                         </p>
-                        <p className="text-white/40 text-xs truncate">
-                          {community.language || "General"} •{" "}
-                          {community.member_count || 0} members
-                        </p>
+                        <div className="flex items-center gap-2 text-xs text-white/40">
+                          <span>{community.language || "General"}</span>
+                          <span className="w-1 h-1 rounded-full bg-white/20"></span>
+                          <span className="flex items-center gap-1">
+                            <FaUsers className="w-3 h-3" />
+                            {community.member_count || 0}
+                          </span>
+                        </div>
                       </div>
                       <FaArrowRight className="text-white/20 group-hover:text-primary transition-colors w-4 h-4 flex-shrink-0" />
                     </div>
@@ -509,13 +518,15 @@ export const DashboardPage = () => {
                 )}
               </div>
             : <div className="text-center py-6 md:py-8">
-                <div className="text-4xl md:text-5xl mb-3">🏗️</div>
+                <div className="flex justify-center mb-3">
+                  <FaUserFriends className="text-5xl text-white/20" />
+                </div>
                 <p className="text-white/60 text-sm md:text-base">
                   You haven't created any communities yet
                 </p>
                 <Link to="/communities">
-                  <Button className="mt-3 text-sm">
-                    <FaUserPlus className="w-4 h-4 mr-2" />
+                  <Button className="mt-3 text-sm flex items-center gap-2">
+                    <FaUserPlus className="w-4 h-4" />
                     Create Your First Community
                   </Button>
                 </Link>

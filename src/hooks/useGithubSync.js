@@ -4,11 +4,13 @@ import { languageService } from "../services/languageService";
 import { repositoryService } from "../services/repositoryService";
 import { analyticsService } from "../services/analyticsService";
 import { contributorService } from "../services/contributorService";
+import { api } from "../services/api"; // Add this import
 
 export const LANGUAGES_SYNCED_EVENT = "languages-synced";
 export const ANALYTICS_SYNCED_EVENT = "analytics-synced";
 export const CONTRIBUTORS_SYNCED_EVENT = "contributors-synced";
 export const CONTRIBUTOR_ACTIVITY_SYNCED_EVENT = "contributor-activity-synced";
+export const CATEGORIES_SYNCED_EVENT = "categories-synced"; // Add this
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -110,6 +112,23 @@ export const useGithubSync = (syncRepositories) => {
   const [currentRepo, setCurrentRepo] = useState(null);
   const [totalRepos, setTotalRepos] = useState(0);
   const [completedRepos, setCompletedRepos] = useState(0);
+  const [syncingCategories, setSyncingCategories] = useState(false);
+
+  const syncCategories = useCallback(async () => {
+    setSyncingCategories(true);
+    try {
+      const response = await api.post("/project-categories/sync/");
+      console.log("Categories synced:", response.data);
+      window.dispatchEvent(new Event(CATEGORIES_SYNCED_EVENT));
+      return response.data;
+    } catch (error) {
+      console.warn("Failed to sync categories:", error);
+      // Don't throw - categories sync is optional
+      return null;
+    } finally {
+      setSyncingCategories(false);
+    }
+  }, []);
 
   const fetchContributorActivity = async (
     repoFullName,
@@ -479,6 +498,7 @@ export const useGithubSync = (syncRepositories) => {
         syncContributors = true,
         forceFull = false,
         currentUsername = null,
+        syncCategories: shouldSyncCategories = true, // Add this option
       } = options;
       setSyncError(null);
       setSyncing(true);
@@ -604,10 +624,24 @@ export const useGithubSync = (syncRepositories) => {
         setSyncMessage(
           `✅ Successfully synced ${githubRepos.length} repositories${skipNote}${failureNote}`,
         );
+
+        // Auto-sync categories after repositories are synced
+        let categoriesResult = null;
+        if (shouldSyncCategories) {
+          setSyncMessage("Syncing categories...");
+          categoriesResult = await syncCategories();
+          if (categoriesResult) {
+            setSyncMessage(
+              `✅ Successfully synced ${githubRepos.length} repositories and ${categoriesResult.count} categories`,
+            );
+          }
+        }
+
         return {
           success: true,
           partialFailure: totalFailedActivity > 0,
           skippedCount,
+          categoriesSynced: categoriesResult?.count || 0,
         };
       } catch (err) {
         console.error("Sync failed:", err);
@@ -635,7 +669,7 @@ export const useGithubSync = (syncRepositories) => {
         setCurrentRepo(null);
       }
     },
-    [syncRepositories, syncSingleRepository],
+    [syncRepositories, syncSingleRepository, syncCategories],
   );
 
   return {
@@ -647,5 +681,7 @@ export const useGithubSync = (syncRepositories) => {
     currentRepo,
     totalRepos,
     completedRepos,
+    syncingCategories,
+    syncCategories, // Export this for manual category sync
   };
 };

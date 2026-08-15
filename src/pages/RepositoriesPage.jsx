@@ -1,5 +1,5 @@
 // pages/RepositoriesPage.jsx
-import React from "react";
+import React, { useEffect } from "react";
 import { useRepositories } from "../hooks/useRepositories";
 import { useGithubSync } from "../hooks/useGithubSync";
 import { useAlert } from "../contexts/AlertContext";
@@ -21,24 +21,30 @@ export const RepositoriesPage = () => {
     setFilters,
   } = useRepositories();
 
-  const { runSync, syncing, syncError } = useGithubSync(syncRepositories);
+  const { runSync, syncing, syncError, syncMessage } =
+    useGithubSync(syncRepositories);
 
-  const handleSync = async () => {
+  const handleSync = async (forceFull = false) => {
     try {
-      const { success, error: err } = await runSync();
+      const { success, error: err } = await runSync({
+        syncContributors: true,
+        forceFull: forceFull,
+      });
       if (!success) {
         showAlert(err || "Failed to sync repositories");
         return;
       }
       await fetchRepositories();
-      showAlert("Repositories synced successfully!");
+      showAlert(
+        `Repositories synced successfully!${forceFull ? " (Full refresh)" : ""}`,
+      );
     } catch (error) {
       showAlert(error.message || "Failed to sync repositories");
     }
   };
 
   // Show sync error if it occurs
-  React.useEffect(() => {
+  useEffect(() => {
     if (syncError) {
       showAlert(syncError);
     }
@@ -64,13 +70,23 @@ export const RepositoriesPage = () => {
               {repositories.length} repositories found
             </p>
           </div>
-          <Button
-            onClick={handleSync}
-            disabled={loading || syncing}
-            className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary">
-            <FaSync className={syncing ? "animate-spin" : ""} />
-            {syncing ? "Syncing..." : "Sync"}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              onClick={() => handleSync(false)}
+              disabled={loading || syncing}
+              className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary">
+              <FaSync className={syncing ? "animate-spin" : ""} />
+              {syncing ? "Syncing..." : "Sync"}
+            </Button>
+            <Button
+              onClick={() => handleSync(true)}
+              disabled={loading || syncing}
+              variant="outline"
+              className="flex items-center gap-2">
+              <FaSync className={syncing ? "animate-spin" : ""} />
+              Full Refresh
+            </Button>
+          </div>
         </div>
 
         <RepositoryList
