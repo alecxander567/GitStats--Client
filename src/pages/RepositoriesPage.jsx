@@ -62,19 +62,21 @@ export const RepositoriesPage = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-white">Repositories</h1>
-            <p className="text-white/60">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">
+              Repositories
+            </h1>
+            <p className="text-sm sm:text-base text-white/60">
               {repositories.length} repositories found
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col xs:flex-row gap-2 w-full sm:w-auto">
             <Button
               onClick={() => handleSync(false)}
               disabled={loading || syncing}
-              className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary">
+              className="flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-secondary w-full sm:w-auto">
               <FaSync className={syncing ? "animate-spin" : ""} />
               {syncing ? "Syncing..." : "Sync"}
             </Button>
@@ -82,7 +84,7 @@ export const RepositoriesPage = () => {
               onClick={() => handleSync(true)}
               disabled={loading || syncing}
               variant="outline"
-              className="flex items-center gap-2">
+              className="flex items-center justify-center gap-2 w-full sm:w-auto">
               <FaSync className={syncing ? "animate-spin" : ""} />
               Full Refresh
             </Button>
