@@ -18,6 +18,7 @@ import {
   FaInbox,
   FaHashtag,
   FaInfoCircle,
+  FaPlus,
 } from "react-icons/fa";
 
 export const ProjectCategoriesPage = () => {
@@ -75,7 +76,6 @@ export const ProjectCategoriesPage = () => {
     try {
       const response = await api.post("/project-categories/sync/");
       showAlert(response.data.message || "Categories synced successfully!");
-      // Refresh data after sync
       await handleRefresh();
     } catch (error) {
       const errorMessage =
@@ -96,7 +96,6 @@ export const ProjectCategoriesPage = () => {
   const handleCategoryClick = useCallback(
     (category) => {
       if (selectedCategory === category) {
-        // If clicking the same category, clear the filter
         setSelectedCategory(null);
         setFilters((prev) => {
           const newFilters = { ...prev };
@@ -116,7 +115,6 @@ export const ProjectCategoriesPage = () => {
 
   // Filter categories by search term and category filter
   const filteredCategories = categories.filter((cat) => {
-    // Search filter
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       const matchesSearch =
@@ -127,7 +125,6 @@ export const ProjectCategoriesPage = () => {
       if (!matchesSearch) return false;
     }
 
-    // Category filter (already applied via filters, but we also check selectedCategory)
     if (selectedCategory && cat.category !== selectedCategory) {
       return false;
     }
@@ -135,7 +132,6 @@ export const ProjectCategoriesPage = () => {
     return true;
   });
 
-  // Check if any filters are active
   const hasActiveFilters =
     Object.values(filters).some(
       (value) => value !== undefined && value !== null && value !== "",
@@ -143,7 +139,6 @@ export const ProjectCategoriesPage = () => {
     searchTerm ||
     selectedCategory;
 
-  // Display error from hook or local
   const displayError = error || localError;
 
   return (
@@ -166,8 +161,7 @@ export const ProjectCategoriesPage = () => {
             <Button
               onClick={handleSync}
               disabled={loading || statsLoading || syncing}
-              className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary hover:from-primary-light hover:to-primary"
-              title="Auto-categorize all repositories">
+              className="flex items-center gap-2 bg-gradient-to-r from-primary to-secondary hover:from-primary-light hover:to-primary">
               <FaSync className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} />
               {syncing ? "Syncing..." : "Sync Categories"}
             </Button>
@@ -189,16 +183,14 @@ export const ProjectCategoriesPage = () => {
           <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 flex items-center justify-between">
             <span>{displayError}</span>
             <button
-              onClick={() => {
-                setLocalError(null);
-              }}
+              onClick={() => setLocalError(null)}
               className="text-red-400 hover:text-red-300">
               <FaTimes />
             </button>
           </div>
         )}
 
-        {/* Statistics Section with Clickable Categories */}
+        {/* Statistics Section */}
         {stats && (
           <div className="mb-6">
             <CategorySummary
@@ -303,7 +295,6 @@ export const ProjectCategoriesPage = () => {
             )}
           </div>
         : viewMode === "grid" ?
-          // Grid View
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredCategories.map((category) => (
               <div
@@ -344,7 +335,6 @@ export const ProjectCategoriesPage = () => {
               </div>
             ))}
           </div>
-          // List View
         : <div className="bg-white/10 backdrop-blur-xl rounded-2xl border border-white/20 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
