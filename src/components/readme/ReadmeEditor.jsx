@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
 import {
   FaMarkdown,
   FaEye,
@@ -12,6 +14,7 @@ import { LoadingSpinner } from "../common/LoadingSpinner";
 
 export const ReadmeEditor = ({
   content,
+  generatedContent,
   onContentChange,
   onRegenerate,
   onExport,
@@ -112,11 +115,18 @@ export const ReadmeEditor = ({
               <div className="flex items-center justify-center h-full">
                 <LoadingSpinner size="lg" />
               </div>
-            : <div className="prose prose-invert max-w-none">
-                <pre className="whitespace-pre-wrap text-white/80 text-sm font-mono">
-                  {content ||
-                    "No content to preview. Add some content in the Edit tab."}
-                </pre>
+            : generatedContent ?
+              // Preview shows the resolved output (badges/images/tables
+              // filled in), rendered as actual markdown - not the raw
+              // editable template, and not dumped as plain text.
+              <div className="prose prose-invert max-w-none">
+                <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+                  {generatedContent}
+                </ReactMarkdown>
+              </div>
+            : <div className="flex items-center justify-center h-full text-white/40 text-sm text-center px-4">
+                No preview yet. Click Regenerate to generate your README from
+                the current content.
               </div>
             }
           </div>

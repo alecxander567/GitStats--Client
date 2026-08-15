@@ -17,11 +17,20 @@ export const ReadmeProfilePage = () => {
     fetchPreview,
   } = useReadmeProfile();
 
+  // localContent = the raw editable template (with {{placeholders}}).
+  // generatedContent = the last fully-resolved output from the backend
+  // (badges/images/tables filled in). These are two different things now -
+  // profile.content is never overwritten by generation anymore, so the
+  // Preview tab needs to read profile.generated_content, not localContent.
   const [localContent, setLocalContent] = useState("");
+  const [generatedContent, setGeneratedContent] = useState("");
 
   useEffect(() => {
-    if (profile?.content) {
+    if (profile?.content !== undefined) {
       setLocalContent(profile.content);
+    }
+    if (profile?.generated_content !== undefined) {
+      setGeneratedContent(profile.generated_content);
     }
   }, [profile]);
 
@@ -120,6 +129,7 @@ export const ReadmeProfilePage = () => {
         {/* Editor */}
         <ReadmeEditor
           content={localContent}
+          generatedContent={generatedContent}
           onContentChange={handleContentChange}
           onRegenerate={handleRegenerate}
           onExport={handleExport}
