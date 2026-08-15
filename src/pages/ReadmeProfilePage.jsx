@@ -60,12 +60,12 @@ export const ReadmeProfilePage = () => {
 
   return (
     <DashboardLayout>
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
-              <FaFileAlt className="text-secondary" />
+              <FaFileAlt className="text-secondary flex-shrink-0" />
               README Profile
             </h1>
             <p className="text-white/60 text-sm sm:text-base">
@@ -79,21 +79,39 @@ export const ReadmeProfilePage = () => {
         <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl">
           <div className="flex items-start gap-3">
             <FaInfoCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-white/70">
+            <div className="text-sm text-white/70 min-w-0">
               <p>
                 <strong>Placeholders:</strong> Use these in your content to
                 automatically pull in live data:
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2 text-xs text-white/60">
-                <code>{"{{user.name}}"}</code>
-                <code>{"{{user.username}}"}</code>
-                <code>{"{{user.bio}}"}</code>
-                <code>{"{{stats.total_stars}}"}</code>
-                <code>{"{{stats.total_forks}}"}</code>
-                <code>{"{{stats.total_repos}}"}</code>
-                <code>{"{{languages.top_5}}"}</code>
-                <code>{"{{contributions.last_30_days.commits}}"}</code>
-                <code>{"{{current_date}}"}</code>
+              <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 gap-2 mt-2 text-xs text-white/60">
+                <code className="break-all bg-white/5 rounded px-2 py-1">
+                  {"{{user.name}}"}
+                </code>
+                <code className="break-all bg-white/5 rounded px-2 py-1">
+                  {"{{user.username}}"}
+                </code>
+                <code className="break-all bg-white/5 rounded px-2 py-1">
+                  {"{{user.bio}}"}
+                </code>
+                <code className="break-all bg-white/5 rounded px-2 py-1">
+                  {"{{stats.total_stars}}"}
+                </code>
+                <code className="break-all bg-white/5 rounded px-2 py-1">
+                  {"{{stats.total_forks}}"}
+                </code>
+                <code className="break-all bg-white/5 rounded px-2 py-1">
+                  {"{{stats.total_repos}}"}
+                </code>
+                <code className="break-all bg-white/5 rounded px-2 py-1">
+                  {"{{languages.top_5}}"}
+                </code>
+                <code className="break-all bg-white/5 rounded px-2 py-1">
+                  {"{{contributions.last_30_days.commits}}"}
+                </code>
+                <code className="break-all bg-white/5 rounded px-2 py-1">
+                  {"{{current_date}}"}
+                </code>
               </div>
             </div>
           </div>
