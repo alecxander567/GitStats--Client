@@ -146,13 +146,6 @@ export const Sidebar = () => {
         </nav>
 
         <div className="px-3 py-4 border-t border-white/10 space-y-1">
-          <Link
-            to="/settings"
-            onClick={toggleMobileMenu}
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <FaCog className="w-5 h-5 flex-shrink-0" />
-            <span className="font-medium">Settings</span>
-          </Link>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all">
@@ -225,12 +218,6 @@ export const Sidebar = () => {
         </nav>
 
         <div className="px-3 py-4 border-t border-white/10 space-y-1">
-          <Link
-            to="/settings"
-            className="flex items-center gap-3 px-4 py-3 rounded-xl text-white/60 hover:bg-white/5 hover:text-white transition-all">
-            <FaCog className="w-5 h-5 flex-shrink-0" />
-            <span className="font-medium">Settings</span>
-          </Link>
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 transition-all">
